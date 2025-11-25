@@ -51,9 +51,9 @@ All data is retrieved directly from:
 ## 📏 Evaluation Metrics
 The system’s performance will be evaluated based on:
 
-- **Precision@K** – Proportion of relevant recommended songs  
-- **Recall@K** – Ability to recover songs the user actually likes  
-- **Hit Ratio (HR@K)** – Whether at least one recommendation matches the user’s taste  
+- **Precision** – Proportion of relevant recommended songs  
+- **Recall** – Ability to recover songs the user actually likes  
+- **Hit Ratio** – Whether at least one recommendation matches the user’s taste  
 - **Future**: User feedback / qualitative evaluation
 
 ---
