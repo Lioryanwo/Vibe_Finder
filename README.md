@@ -38,7 +38,7 @@ All data is retrieved directly from:
 
 ## 🧠 Planned Models and Methods
 - **Baseline Models:**  
-  - Cosine Similarity  
+  - Decision tree
   - K-Nearest Neighbors (KNN)
 
 - **Advanced Models (next stages):**  
