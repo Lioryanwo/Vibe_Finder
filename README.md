@@ -1,121 +1,120 @@
-🚘 ParkScope – AI-Based Parking Difficulty Prediction
-⭐ Project Motivation
+🚘 ParkScope – Detecting Free Street Parking Spots from a Single Image
+AI-Based Parking Spot Detection using YOLO + Inpainting
+⭐ Overview
 
-Finding street parking in dense urban areas often results in long search times, increased congestion, wasted fuel, and driver frustration.
-Despite advanced navigation tools, no existing system (Waze, Google Maps) provides a real-time estimation of how difficult it will be to find parking near your destination.
+מציאת חניה ברחוב היא משימה יומיומית מתסכלת. פרויקט ParkScope בונה מערכת שמזהה מקומות חניה פנויים בתמונת רחוב יחידה — ללא מידע חיצוני, ללא חיישנים וללא נתונים היסטוריים.
 
-ParkScope introduces an AI-driven parking difficulty estimator designed to enhance navigation and reduce unnecessary driving loops.
+המערכת משתמשת ב:
 
-🎯 Problem Statement
+זיהוי רכבים קיימים
 
-Predict a Parking Difficulty Score (1–10) from a single street-level image, indicating how likely it is to find an available parking spot in that area.
+מחיקה חכמה (Inpainting) של הרכבים
 
-1 → very easy to park
-10 → extremely difficult
+יצירת תוויות (Labels) אוטומטיות של חניות פנויות
 
-🧩 Visual Abstract
+אימון מודל YOLO לגילוי חניות בתמונת רחוב אמיתית
 
-(Insert pipeline_diagram.png here)
-A high-level overview of the detection, feature extraction, and regression components used to generate the difficulty score.
+🎯 Project Goal
+
+Train an object detection model that identifies free parking spots in street-level images.
+
+כלומר — הפלט הוא:
+
+Bounding boxes של מקומות חניה פנויים
+
+🧩 System Pipeline
+ Street Image → Car Detection (YOLO) → Inpainting → Label Generation → Train YOLO → Detect Free Spots
 
 📚 Dataset
 
-ParkScope uses a combination of real, synthetic, and auto-labeled data:
+הדאטה של ParkScope מורכב משני מקורות:
 
-Real street images
-From datasets like Cityscapes and BDD100K.
+1️⃣ Real Images
 
-Synthetic images
-Generated with Stable Diffusion to create scenes with varying densities, lighting, weather, and street layouts.
+KITTI Dataset – תמונות רחוב אמיתיות מצולמות ממצלמת רכב.
+משמשות כבסיס לבניית הדאטה.
 
-Auto-generated labels
-Using parking density heuristics derived from object detection & curb segmentation.
+2️⃣ Auto-Generated Training Data
 
-Numerical features
+נוצר בתהליך אוטומטי:
 
-car_count
+מפעילים YOLO כדי לזהות רכבים בתמונה.
 
-curb_length
+מוחקים את הרכבים באמצעות Diffusion-based Inpainting או כלי inpainting אחר.
 
-density_ratio
+הרקע המשוחזר מגלה את האזורים המועמדים לחניה פנויה.
 
-Additional contextual features extracted from segmentation.
+מייצרים תוויות (bounding boxes) למקומות החניה האלו.
 
-🔧 Data Augmentation & Generation
+🏗️ Data Generation Pipeline
+✔️ Car Detection
 
-To improve robustness and expand the dataset:
+YOLO מזהה bounding boxes של כל הרכבים.
 
-Synthetic variations: crowded vs. empty streets
+✔️ Inpainting
 
-Time-of-day changes: morning, afternoon, night
+המודל "מוחק" את הרכב ומשחזר את שפת המדרכה באופן ריאליסטי.
 
-Weather simulation: rain, fog, low visibility
+✔️ Auto-labeling
 
-Image augmentations: brightness, contrast, blur, shadows
+אזורי המדרכה שנחשפו לאחר מחיקת הרכב מתויגים כ:
 
-Labeling Pipeline:
-YOLO/DETR (car detection) → curb segmentation → density calculation → difficulty score
+Free Parking Spot
 
-🧠 Models & Pipelines
-1. Detection Layer
+כך נבנה דאטה מתויג ללא עבודה ידנית.
 
-YOLO/DETR for identifying parked vehicles and extracting bounding boxes.
+🔧 Data Augmentation
 
-2. Segmentation Layer
+כדי להגדיל את עמידות המודל נוספו:
 
-Curb and road segmentation to estimate available parking space.
+שינויי תאורה (יום/ערב/צללים)
 
-3. Feature Computation
+שינויי בהירות וקונטרסט
 
-Density ratio = number_of_cars / curb_length
+טשטוש, רעש
 
-4. Regression Models
+חיתוכים אקראיים (Random Crop)
 
-XGBoost Regressor (baseline for numeric features)
+🧠 Model
+✔️ YOLO (v8/v9) – Parking Spot Detector
 
-ResNet50 (fine-tuned vision regression model)
-
-Vision Transformer (ViT-B/16) (state-of-the-art deep learning model)
+זהו המודל העיקרי והיחיד בפרויקט.
+הוא מאומן לזהות חניה פנויה בתמונה באמצעות הדאטה שנוצר.
 
 🏋️ Training Process
 
-Train XGBoost baseline using extracted features.
+יצירת סט אימון מלא הכולל:
 
-Fine-tune ResNet50 and ViT on full images.
+תמונות Inpainting
 
-Compare model performance across the same validation/test sets.
+תוויות Bounding Boxes
 
-Tune hyperparameters and experiment with augmentation strategies.
+חלוקה:
 
-Evaluate and refine density-based labeling heuristics.
+Train / Validation / Test
 
-📏 Metrics
+אימון YOLO לאיתור חניה פנויה.
 
-Models are evaluated using:
+ניתוח ביצועים ושיפור המודל.
 
-MAE – Mean Absolute Error
+📏 Evaluation Metrics
 
-RMSE – Root Mean Square Error
+הערכת הביצועים מתבצעת באמצעות:
 
-Difficulty Category Accuracy (easy / medium / hard)
+mAP@50 – מדד הצלחה כלל-מערכתי
 
-Pearson Correlation between prediction and true density
+Precision & Recall
+
+דוגמאות איכותיות (visual examples)
 
 📈 Results
 
-(Insert plots, tables, and visualizations here.)
-Examples include:
-
-Comparison charts of model performance
-
-Error distribution graphs
-
-Qualitative examples of predicted scores vs. ground truth
+(הוסף תמונות, דוגמאות Inpainting, תוצאות YOLO וכו׳ כשהן יהיו מוכנות)
 
 📁 Repository Structure
 
-(Insert the structure you approved earlier.)
+(להוסיף בהתאם לתיקיות שיש לך — אם תרצה, אבנה לך מבנה קלאסי ל-MLOps)
 
-👤 Team Members
+👤 Team
 
 Lior Yanwo
